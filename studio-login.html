@@ -9,8 +9,10 @@
 <body>
   <main class="container" style="padding:6rem 20px; max-width:520px;">
     <h2>Studio Login (Devs & Helpers)</h2>
-    <p>This area is restricted to development staff and studio helpers. Enter the studio password to continue.</p>
+    <p>This area is restricted to development staff and studio helpers. Enter your username and password to continue. New usernames will be created automatically.</p>
     <form id="login-form" style="margin-top:1rem; display:flex; flex-direction:column; gap:0.75rem;">
+      <label style="font-weight:600">Username</label>
+      <input id="username" type="text" placeholder="username" required style="padding:0.8rem; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:var(--secondary-color); color:var(--text-color);">
       <label style="font-weight:600">Password</label>
       <input id="password" type="password" placeholder="Studio password" required style="padding:0.8rem; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:var(--secondary-color); color:var(--text-color);">
       <div style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:0.5rem;">
@@ -22,20 +24,66 @@
     <p style="margin-top:1rem; color:var(--light-text); font-size:0.9rem;">Note: This uses a client-side password check for convenience only. For production-grade access control, use a server-side auth solution.</p>
   </main>
   <script src="studio-auth.js"></script>
+  <div id="passkey-modal" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; z-index:4000;">
+    <div style="position:absolute; inset:0; background:rgba(0,0,0,0.6);"></div>
+    <div style="position:relative; margin:auto; max-width:520px; background:var(--secondary-color); padding:1.25rem; border-radius:8px; z-index:4001; color:var(--text-color);">
+      <h3 style="margin-top:0;">Add a passkey?</h3>
+      <p style="color:var(--light-text);">Would you like to add a passkey (e.g., Windows/Mac platform authenticator) to this account? This enables passwordless sign-in on this device.</p>
+      <div style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:0.75rem;">
+        <button id="passkey-yes" class="submit-button">Yes, add passkey</button>
+        <button id="passkey-no" class="submit-button" style="background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--light-text);">No, later</button>
+      </div>
+      <div id="passkey-msg" style="margin-top:0.5rem; color:var(--highlight-color); display:none;"></div>
+    </div>
+  </div>
   <script>
     const form = document.getElementById('login-form');
+    const uname = document.getElementById('username');
     const pwd = document.getElementById('password');
     const msg = document.getElementById('login-msg');
+    const passkeyModal = document.getElementById('passkey-modal');
+    const passkeyYes = document.getElementById('passkey-yes');
+    const passkeyNo = document.getElementById('passkey-no');
+    const passkeyMsg = document.getElementById('passkey-msg');
 
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       msg.style.display = 'none';
-      const ok = await window.studioAuth.login(pwd.value);
-      if (ok) {
-        location.href = 'studio-dashboard.html';
+      const username = uname.value.trim();
+      const password = pwd.value;
+      if (!username) { msg.textContent = 'Enter a username'; msg.style.display='block'; return; }
+      const res = await window.studioAuth.loginUser(username, password);
+      if (res.ok) {
+        // after login, ask about passkey (unless already registered)
+        if (!window.studioAuth.isPasskeyRegistered(username) && window.PublicKeyCredential) {
+          passkeyModal.style.display = 'flex';
+        } else {
+          location.href = 'studio-dashboard.html';
+        }
       } else {
-        msg.textContent = 'Incorrect password';
+        msg.textContent = 'Incorrect username or password';
         msg.style.display = 'block';
+      }
+    });
+
+    passkeyNo.addEventListener('click', () => {
+      passkeyModal.style.display = 'none';
+      location.href = 'studio-dashboard.html';
+    });
+
+    passkeyYes.addEventListener('click', async () => {
+      passkeyMsg.style.display = 'none';
+      passkeyYes.disabled = true;
+      try {
+        const username = uname.value.trim();
+        const info = await window.studioAuth.registerPasskeyForUser(username);
+        passkeyMsg.textContent = 'Passkey registered.';
+        passkeyMsg.style.display = 'block';
+        setTimeout(()=> location.href = 'studio-dashboard.html', 800);
+      } catch (err) {
+        passkeyMsg.textContent = 'Passkey registration failed: '+err.message;
+        passkeyMsg.style.display = 'block';
+        passkeyYes.disabled = false;
       }
     });
   </script>

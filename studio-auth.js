@@ -6,6 +6,7 @@
 const STORED_HASH = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"; // empty string hash placeholder
 const STORAGE_KEY = 'studioAuthToken';
 const TOKEN_VALUE = 'authenticated';
+const KEY_USERS = 'studio_users';
 
 function buf2hex(buffer) {
   return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
@@ -26,6 +27,96 @@ async function login(password) {
   }
   return false;
 }
+
+// --- User management (username + password) ---
+function _loadUsers(){
+  try{
+    return JSON.parse(localStorage.getItem(KEY_USERS) || '{}');
+  }catch(e){return {};}
+}
+
+function _saveUsers(u){ localStorage.setItem(KEY_USERS, JSON.stringify(u)); }
+
+function _b64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function _fromB64(str){ return Uint8Array.from(atob(str), c=>c.charCodeAt(0)); }
+
+async function _derivePasswordHash(password, salt){
+  const enc = new TextEncoder();
+  const pw = enc.encode(password);
+  const key = await crypto.subtle.importKey('raw', pw, 'PBKDF2', false, ['deriveBits','deriveKey']);
+  const derived = await crypto.subtle.deriveBits({name:'PBKDF2', salt, iterations:100000, hash:'SHA-256'}, key, 256);
+  return _b64(derived);
+}
+
+async function createUser(username, password){
+  const users = _loadUsers();
+  if (users[username]) return false;
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const hash = await _derivePasswordHash(password, salt);
+  users[username] = { salt: _b64(salt), hash, passkey: null };
+  _saveUsers(users);
+  return true;
+}
+
+async function loginUser(username, password){
+  const users = _loadUsers();
+  if (!users[username]){
+    // Create new user automatically
+    await createUser(username, password);
+    localStorage.setItem(STORAGE_KEY, TOKEN_VALUE);
+    localStorage.setItem('studio_user', username);
+    return { ok:true, created:true };
+  }
+  const record = users[username];
+  const salt = _fromB64(record.salt);
+  const hash = await _derivePasswordHash(password, salt);
+  if (hash === record.hash){
+    localStorage.setItem(STORAGE_KEY, TOKEN_VALUE);
+    localStorage.setItem('studio_user', username);
+    return { ok:true, created:false };
+  }
+  return { ok:false };
+}
+
+function currentUser(){ return localStorage.getItem('studio_user') || null; }
+
+// --- Passkey (WebAuthn) registration helpers (client-only, stores id in users map) ---
+function _u8ToB64(u8){ return btoa(String.fromCharCode(...u8)); }
+function _b64ToU8(b){ return Uint8Array.from(atob(b), c=>c.charCodeAt(0)); }
+
+async function registerPasskeyForUser(username){
+  if (!window.PublicKeyCredential) throw new Error('WebAuthn not supported');
+  const challenge = crypto.getRandomValues(new Uint8Array(32));
+  const userId = new TextEncoder().encode(username);
+  const pubOptions = {
+    challenge: challenge,
+    rp: { name: 'VisionVT' },
+    user: { id: userId, name: username, displayName: username },
+    pubKeyCredParams: [{ alg: -7, type: 'public-key' }],
+    timeout: 60000,
+    attestation: 'none'
+  };
+  const cred = await navigator.credentials.create({ publicKey: pubOptions });
+  const rawId = new Uint8Array(cred.rawId);
+  const users = _loadUsers();
+  if (!users[username]) users[username] = { salt:null, hash:null, passkey:null };
+  users[username].passkey = { id: _u8ToB64(rawId), type: cred.type };
+  _saveUsers(users);
+  return users[username].passkey;
+}
+
+function isPasskeyRegistered(username){
+  const users = _loadUsers();
+  return users[username] && users[username].passkey;
+}
+
+window.studioAuth = Object.assign(window.studioAuth, {
+  createUser,
+  loginUser,
+  currentUser,
+  registerPasskeyForUser,
+  isPasskeyRegistered
+});
 
 function logout() {
   localStorage.removeItem(STORAGE_KEY);
