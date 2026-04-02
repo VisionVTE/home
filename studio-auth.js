@@ -57,7 +57,7 @@ async function createUser(username, password){
   if (users[username]) return false;
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const hash = await _derivePasswordHash(password, salt);
-  users[username] = { salt: _b64(salt), hash, passkey: null };
+  users[username] = { salt: _b64(salt), hash, passkey: null, twofa_secret: null };
   _saveUsers(users);
   return true;
 }
@@ -232,21 +232,37 @@ async function verifyTOTP(secretBase32, code) {
 }
 
 function is2FAEnabled() {
-  return localStorage.getItem(KEY_2FA_ENABLED) === '1';
+  const user = currentUser();
+  if (!user) return false;
+  const users = _loadUsers();
+  return users[user] && users[user].twofa_secret;
 }
 
 function get2FASecret() {
-  return localStorage.getItem(KEY_2FA_SECRET) || null;
+  const user = currentUser();
+  if (!user) return null;
+  const users = _loadUsers();
+  return users[user] ? users[user].twofa_secret : null;
 }
 
 function enable2FA(secretBase32) {
-  localStorage.setItem(KEY_2FA_SECRET, secretBase32);
-  localStorage.setItem(KEY_2FA_ENABLED, '1');
+  const user = currentUser();
+  if (!user) return;
+  const users = _loadUsers();
+  if (users[user]) {
+    users[user].twofa_secret = secretBase32;
+    _saveUsers(users);
+  }
 }
 
 function disable2FA() {
-  localStorage.removeItem(KEY_2FA_SECRET);
-  localStorage.removeItem(KEY_2FA_ENABLED);
+  const user = currentUser();
+  if (!user) return;
+  const users = _loadUsers();
+  if (users[user]) {
+    users[user].twofa_secret = null;
+    _saveUsers(users);
+  }
 }
 
 function mark2FAPromptShownToday() {
