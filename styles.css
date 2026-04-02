@@ -229,26 +229,27 @@ body {
 
 /* About Section */
 .about {
-    padding: 80px 0;
+    padding: 64px 20px 48px 20px;
     background: linear-gradient(135deg, #f3e5f5 0%, #fce4ec 100%);
-    .about {
-        padding: 64px 0 48px 0;
-        background: linear-gradient(135deg, #f3e5f5 0%, #fce4ec 100%);
-    }
+}
+
+.about .container {
+    background: var(--surface);
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 3rem 2.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
 
 .about h2 {
     font-size: 2.5rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
     text-align: center;
-    color: var(--text-color);
-    .about h2 {
-        font-size: 2.5rem;
-        margin-bottom: 2.5rem;
-        text-align: center;
-        color: var(--highlight-color);
-        font-weight: 700;
-        letter-spacing: 1px;
-    }
+    color: var(--highlight-color);
+    font-weight: 700;
+    letter-spacing: 1px;
+}
 
 .about-content {
     display: grid;
@@ -260,21 +261,10 @@ body {
         grid-template-columns: 1fr 1fr;
         gap: 2.5rem;
         align-items: flex-start;
-        max-width: 900px;
-        margin: 0 auto;
-    }
 
-.about-text p {
-    margin-bottom: 1.5rem;
-    font-size: 1.05rem;
     color: var(--text-color);
     line-height: 1.8;
-    .about-text {
-        background: var(--surface);
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        padding: 2rem 2rem 1.5rem 2rem;
-    }
+
     .about-text p {
         margin-bottom: 1.2rem;
         font-size: 1.08rem;
@@ -372,25 +362,26 @@ body {
 
 /* Team Section */
 .team {
-    padding: 80px 0;
-    background-color: var(--secondary-color);
-    .team {
-        padding: 48px 0 32px 0;
-        background: var(--surface-variant);
-    }
+    padding: 48px 20px 32px 20px;
+    background: var(--surface-variant);
+}
+
+.team .container {
+    background: var(--surface);
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 3rem 2.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
 
 .team h2 {
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
     text-align: center;
-    color: var(--success-color);
-    .team h2 {
-        font-size: 2.2rem;
-        margin-bottom: 2rem;
-        text-align: center;
-        color: var(--highlight-color);
-        font-weight: 700;
-    }
+    color: var(--highlight-color);
+    font-weight: 700;
+}
 
 .team-grid {
     display: grid;
@@ -448,15 +439,25 @@ body {
 
 /* Contact Section */
 .contact {
-    padding: 80px 0;
-    background-color: var(--primary-color);
+    padding: 48px 20px 32px 20px;
+    background: var(--primary-color);
+}
+
+.contact .container {
+    background: var(--surface);
+    border-radius: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 3rem 2.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 .contact h2 {
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
     text-align: center;
-    color: var(--success-color);
+    color: var(--highlight-color);
+    font-weight: 700;
 }
 
 .contact-content {
@@ -548,16 +549,12 @@ body {
 /* Footer */
 .footer {
     background-color: var(--primary-container);
-    padding: 2rem 0;
+    padding: 3rem 0 2rem 0;
     text-align: center;
     border-top: 1px solid var(--outline);
-    .footer {
-        background-color: var(--primary-container);
-        padding: 1.5rem 0 1rem 0;
-        text-align: center;
-        border-top: 1px solid var(--outline);
-        margin-top: 32px;
-    }
+    margin-top: 32px;
+    min-height: 120px;
+}
 
 .footer p {
     color: var(--on-primary-container);
