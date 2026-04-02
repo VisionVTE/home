@@ -10,6 +10,8 @@ const STORAGE_KEY = 'studioAuthToken';
 const TOKEN_VALUE = 'authenticated';
 const KEY_USERS = 'studio_users';
 
+window.studioAuth = {}; // Initialize
+
 function buf2hex(buffer) {
   return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
@@ -119,7 +121,7 @@ function isPasskeyRegistered(username){
   return users[username] && users[username].passkey;
 }
 
-window.studioAuth = Object.assign(window.studioAuth, {
+Object.assign(window.studioAuth, {
   createUser,
   loginUser,
   currentUser,
@@ -145,7 +147,7 @@ function protect() {
   }
 }
 
-window.studioAuth = { login, logout, isAuthenticated, protect, sha256hex };
+Object.assign(window.studioAuth, { login, logout, isAuthenticated, protect, sha256hex });
 
 // --- 2FA (TOTP) helpers ---
 // Stored in localStorage under keys below. CLIENT-SIDE ONLY — not secure for production.
@@ -269,71 +271,4 @@ window.studioAuth = Object.assign(window.studioAuth, {
   get2FASecret,
   mark2FAPromptShownToday,
   shouldShow2FAPrompt
-});
-
-// --- Backup codes and encryption helpers ---
-const KEY_BACKUPS = 'studio_2fa_backups';
-
-function randomAlphaNum(len){
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567890abcdefghijklmnopqrstuvwxyz';
-  let out = '';
-  const arr = new Uint8Array(len);
-  crypto.getRandomValues(arr);
-  for(let i=0;i<len;i++) out += chars[arr[i] % chars.length];
-  return out;
-}
-
-function generateBackupCodes(count=10){
-  const codes = [];
-  for(let i=0;i<count;i++) codes.push(randomAlphaNum(10));
-  // store plain backup codes in localStorage for convenience (encrypted file recommended)
-  localStorage.setItem(KEY_BACKUPS, JSON.stringify(codes));
-  return codes;
-}
-
-async function deriveKeyFromPassword(password, salt){
-  const enc = new TextEncoder();
-  const pw = enc.encode(password);
-  const baseKey = await crypto.subtle.importKey('raw', pw, 'PBKDF2', false, ['deriveKey']);
-  return crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:100000, hash:'SHA-256'}, baseKey, {name:'AES-GCM', length:256}, false, ['encrypt','decrypt']);
-}
-
-async function encryptTextWithPassword(password, plain){
-  const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const key = await deriveKeyFromPassword(password, salt);
-  const enc = new TextEncoder();
-  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, key, enc.encode(plain));
-  const combined = new Uint8Array(salt.byteLength + iv.byteLength + ct.byteLength);
-  combined.set(salt,0); combined.set(iv,salt.byteLength); combined.set(new Uint8Array(ct), salt.byteLength+iv.byteLength);
-  return btoa(String.fromCharCode(...combined));
-}
-
-async function decryptTextWithPassword(password, dataB64){
-  const raw = atob(dataB64);
-  const arr = Uint8Array.from(raw.split('').map(c=>c.charCodeAt(0)));
-  const salt = arr.slice(0,16);
-  const iv = arr.slice(16,28);
-  const ct = arr.slice(28);
-  const key = await deriveKeyFromPassword(password, salt);
-  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ct);
-  return new TextDecoder().decode(pt);
-}
-
-function downloadEncryptedBackupFile(password, codes){
-  return encryptTextWithPassword(password, JSON.stringify(codes)).then(b64=>{
-    const blob = new Blob([b64], {type:'text/plain'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'studio-backup-codes.txt';
-    a.click();
-    URL.revokeObjectURL(a.href);
-  });
-}
-
-window.studioAuth = Object.assign(window.studioAuth, {
-  generateBackupCodes,
-  encryptTextWithPassword,
-  decryptTextWithPassword,
-  downloadEncryptedBackupFile
 });
