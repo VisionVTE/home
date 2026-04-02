@@ -55,6 +55,27 @@ body {
     letter-spacing: 2px;
 }
 
+/* Site logo in navbar */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.site-logo {
+    width: 48px;
+    height: auto;
+    display: block;
+}
+
+/* Large logo on homepage */
+.hero-logo {
+    width: 220px;
+    max-width: 60%;
+    height: auto;
+    margin: 0 auto 1rem;
+    display: block;
+}
+
 .logo .highlight {
     color: var(--highlight-color);
 }
@@ -90,6 +111,16 @@ body {
 
 .nav-links a:hover::after {
     width: 100%;
+}
+
+/* Studio login link styling (small badge) */
+.nav-links a[href="studio-login.html"] {
+    padding: 6px 10px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+}
+.nav-links a[href="studio-login.html"]:hover {
+    background: rgba(255,255,255,0.06);
 }
 
 /* Hero Section */
@@ -558,79 +589,35 @@ body {
     }
 }
 
-/* Newsletter Popup Styles */
-.newsletter-popup {
+/* Newsletter popup styles removed */
+
+/* 2FA modal styles */
+.twofa-modal {
     position: fixed;
     inset: 0;
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 3000;
 }
-.newsletter-popup[aria-hidden="false"] {
+.twofa-modal[aria-hidden="false"] {
     display: flex;
 }
-.popup-overlay {
+.twofa-overlay {
     position: absolute;
     inset: 0;
     background: rgba(0,0,0,0.6);
 }
-.popup-content {
+.twofa-box {
     position: relative;
     background: linear-gradient(180deg, var(--secondary-color), var(--primary-color));
     color: var(--text-color);
-    padding: 1.75rem;
+    padding: 1.5rem;
     border-radius: 12px;
     width: 100%;
-    max-width: 420px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    max-width: 640px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
     z-index: 1;
 }
-.popup-close {
-    position: absolute;
-    right: 12px;
-    top: 8px;
-    background: transparent;
-    border: none;
-    color: var(--light-text);
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-.popup-content h3 {
-    margin-bottom: 0.5rem;
-    color: var(--success-color);
-}
-.popup-form input[type="email"] {
-    width: 100%;
-    padding: 0.75rem 0.9rem;
-    margin: 0.6rem 0 1rem 0;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.06);
-    background: rgba(255,255,255,0.03);
-    color: var(--text-color);
-}
-.popup-actions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-}
-.subscribe-button {
-    background: linear-gradient(135deg, var(--highlight-color), #ff6b7a);
-    color: #fff;
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-}
-.popup-later {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.08);
-    color: var(--light-text);
-    padding: 0.55rem 0.9rem;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-@media (max-width: 480px) {
-    .popup-content { padding: 1rem; margin: 0 12px; }
-}
+.twofa-box h3 { margin-bottom: 0.25rem; color: var(--success-color); }
+.twofa-box p { color: var(--light-text); }
