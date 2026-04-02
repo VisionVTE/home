@@ -237,7 +237,7 @@ body {
     font-size: 2.5rem;
     margin-bottom: 3rem;
     text-align: center;
-    color: var(--success-color);
+    color: var(--text-color);
 }
 
 .about-content {
@@ -250,7 +250,7 @@ body {
 .about-text p {
     margin-bottom: 1.5rem;
     font-size: 1.05rem;
-    color: var(--light-text);
+    color: var(--text-color);
     line-height: 1.8;
 }
 
@@ -504,7 +504,7 @@ body {
 }
 
 .footer p {
-    color: var(--light-text);
+    color: var(--on-primary-container);
     margin-bottom: 0.5rem;
 }
 
