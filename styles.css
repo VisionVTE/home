@@ -231,28 +231,56 @@ body {
 .about {
     padding: 80px 0;
     background: linear-gradient(135deg, #f3e5f5 0%, #fce4ec 100%);
-}
+    .about {
+        padding: 64px 0 48px 0;
+        background: linear-gradient(135deg, #f3e5f5 0%, #fce4ec 100%);
+    }
 
 .about h2 {
     font-size: 2.5rem;
     margin-bottom: 3rem;
     text-align: center;
     color: var(--text-color);
-}
+    .about h2 {
+        font-size: 2.5rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        color: var(--highlight-color);
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
 
 .about-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
     align-items: center;
-}
+    .about-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+        align-items: flex-start;
+        max-width: 900px;
+        margin: 0 auto;
+    }
 
 .about-text p {
     margin-bottom: 1.5rem;
     font-size: 1.05rem;
     color: var(--text-color);
     line-height: 1.8;
-}
+    .about-text {
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        padding: 2rem 2rem 1.5rem 2rem;
+    }
+    .about-text p {
+        margin-bottom: 1.2rem;
+        font-size: 1.08rem;
+        color: var(--on-surface);
+        line-height: 1.7;
+    }
 
 .about-stats {
     display: grid;
@@ -346,20 +374,34 @@ body {
 .team {
     padding: 80px 0;
     background-color: var(--secondary-color);
-}
+    .team {
+        padding: 48px 0 32px 0;
+        background: var(--surface-variant);
+    }
 
 .team h2 {
     font-size: 2.5rem;
     margin-bottom: 3rem;
     text-align: center;
     color: var(--success-color);
-}
+    .team h2 {
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: var(--highlight-color);
+        font-weight: 700;
+    }
 
 .team-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
-}
+    .team-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
+    }
 
 .team-member {
     background-color: var(--primary-color);
@@ -367,7 +409,15 @@ body {
     border-radius: 10px;
     text-align: center;
     transition: transform 0.3s ease;
-}
+    .team-member {
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        padding: 1.5rem 2rem 1.2rem 2rem;
+        text-align: center;
+        width: 100%;
+        max-width: 350px;
+    }
 
 .team-member:hover {
     transform: scale(1.05);
@@ -501,12 +551,22 @@ body {
     padding: 2rem 0;
     text-align: center;
     border-top: 1px solid var(--outline);
-}
+    .footer {
+        background-color: var(--primary-container);
+        padding: 1.5rem 0 1rem 0;
+        text-align: center;
+        border-top: 1px solid var(--outline);
+        margin-top: 32px;
+    }
 
 .footer p {
     color: var(--on-primary-container);
     margin-bottom: 0.5rem;
-}
+    .footer p {
+        color: var(--on-primary-container);
+        margin-bottom: 0.2rem;
+        font-size: 1rem;
+    }
 
 /* Animations */
 @keyframes fadeInDown {
